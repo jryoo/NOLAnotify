@@ -31,6 +31,12 @@ class MembersController < ApplicationController
     #@member = Member.find(params[:id])
   end
 
+  def verify
+  end
+
+  def verified
+  end
+
   def create
     @member = Member.new(params[:member])
     
