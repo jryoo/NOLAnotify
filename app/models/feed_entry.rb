@@ -2,7 +2,7 @@ class FeedEntry < ActiveRecord::Base
   attr_accessible :guid, :name, :published_at, :summary, :url
 
   # Main function that is called by the scheduler add-on
-  # Sanitizes the feed (removes harmful stuff - not sure what that means)
+  # Sanitizes the feed
   # Calls add_entries
   def self.update_from_feed(feed_url)
   	feed = Feedzirra::Feed.fetch_and_parse(feed_url)
@@ -30,7 +30,10 @@ class FeedEntry < ActiveRecord::Base
   # Main function called by update_from_feed. It adds multiple entries from the feed
   def self.add_entries(entries)
   	entries.each do |entry|
-  		unless exists? :guid => entry.id
+      entry.each do |key, value|
+        entry[key] = CGI.unescapeHTML(value)
+      end
+  		unless exists? :guid => entry.id && entry.title =~ /boil/i
   			create!(
   				:name			=> entry.title,
   				:summary		=> entry.summary,
